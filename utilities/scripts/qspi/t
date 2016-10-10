@@ -1,0 +1,23 @@
+SEGGER J-Link Commander V5.02c ('?' for help)
+Compiled Sep 10 2015 17:40:07
+DLL version V5.02c, compiled Sep 10 2015 17:39:31
+Firmware: J-Link OB-SAM3U128 V3 compiled Jul  5 2016 08:42:14
+Hardware: V3.00
+S/N: 483000237 
+Feature(s): RDI 
+Emulator has Trace capability
+VTarget = 3.300V
+Info: Could not measure total IR len. TDO is constant high.
+Info: Could not measure total IR len. TDO is constant high.
+No devices found on JTAG chain. Trying to find device on SWD.
+Info: Found SWD-DP with ID 0x0BB11477
+Info: Found Cortex-M0 r0p0, Little endian.
+Info: FPUnit: 4 code (BP) slots and 0 literal slots
+Info: CoreSight components:
+Info: ROMTbl 0 @ E00FF000
+Info: ROMTbl 0 [0]: FFF0F000, CID: B105E00D, PID: 000BB008 SCS
+Info: ROMTbl 0 [1]: FFF02000, CID: B105E00D, PID: 000BB00A DWT
+Info: ROMTbl 0 [2]: FFF03000, CID: B105E00D, PID: 000BB00B FPB
+Cortex-M0 identified.
+Target interface speed: 100 kHz
+J-Link>

@@ -1,0 +1,30 @@
+LICENSES
+
+NAME                    LICENSE FILE PATH                                       LICENSE                                   COMMENTS
+-------------------------------------------------------------------------------------------------------------------------------------------
+Black Orca application  projects\dk_apps\*                                      Dialog Semiconductor 
+-------------------------------------------------------------------------------------------------------------------------------------------
+Black Orca SDK Core     sdk\bsp\adapters\*                                      Dialog Semiconductor 
+                        sdk\bsp\config\*                                        Dialog Semiconductor 
+                        sdk\bsp\free_rtos\*                                     FreeRTOS License                         (www.freertos.org)
+                        sdk\bsp\include\*                                       ARM and Dialog Semiconductor             (see file headers)
+                        sdk\bsp\memory\*                                        Dialog Semiconductor 
+                        sdk\bsp\osal\*                                          Dialog Semiconductor 
+                        sdk\bsp\peripherals\*                                   Dialog Semiconductor 
+                        sdk\bsp\startup\*                                       ARM and Dialog Semiconductor             (see file headers)
+                        sdk\bsp\system\*                                        Dialog Semiconductor 
+                        sdk\interfaces\ble\*                                    CEVA and Dialog Semiconductor            (see file headers)
+                        sdk\interfaces\ble_clients\*                            Dialog Semiconductor 
+                        sdk\interfaces\ble_services\*                           Dialog Semiconductor 
+                        sdk\interfaces\usb\*                                    Dialog Semiconductor 
+                        sdk\middleware\RTT\*                                    SEGGER Microcontroller GmbH & Co. KG
+-------------------------------------------------------------------------------------------------------------------------------------------
+Utilities               utilities\bin2image\*                                   Dialog Semiconductor 
+                        utilities\cli_programmer\*                              Dialog Semiconductor 
+                        utilities\mkimage\*                                     Cameron Rich and Dialog Semiconductor    (see file headers) 
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+This software contains Third Party Software elements and Additional Terms and Conditions for such licensed third party software components 
+included within this software. These  additional terms and conditions are made a part of and incorporated by reference into the Dialog Software 
+License Agreement covering this software. A full copy of the appropriate Software License Agreement may be obtained from Dialog Semiconductor 
+by sending an email request to black.orca.support@diasemi.com

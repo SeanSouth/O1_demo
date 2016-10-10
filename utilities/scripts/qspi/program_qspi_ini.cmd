@@ -1,0 +1,3 @@
+set CHIP_REV=AD 
+set ENABLE_UART=y 
+set RAM_SHUFFLING=0 

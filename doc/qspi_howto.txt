@@ -1,0 +1,128 @@
+1. General
+============================================
+This guide describes the methods and tools used for:
+-Programming QSPI flash
+-Debugging programs which execute from QSPI flash
+
+After programming the QSPI, the image will execute by resetting or power cycling the board.
+
+2. References
+============================================
+-cli_programmer.pdf
+
+3. PROGRAMMING QSPI FLASH
+============================================
+3.1 PRE-REQUISITES
+--------------------------------------------
+Compile the following tools (sources and projects available on SDK):
+-cli_programmer:
+Compile utilities/cli_programmer project. 
+Linux: Use Debug_static build configuration from Eclipse
+WIN: Compile cli_programmer.sln using Visual studio OR use the binaries from SDK's "binaries" folder (cli_programmer.exe, libprogrammer.dll)
+
+-bin2image:
+Compile utilities/bin2image project.
+Linux: Run make from project's folder
+WIN: Check README.win32 in project's folder OR use the binary from SDK's "binaries" folder (bin2image.exe) 
+
+-uartboot.bin:
+This is the intermediate bootloader that cli_programmer uses for communicating with the target.
+Compile ./sdk/bsp/system/loaders/uartboot/ from Eclipse.
+
+NOTE: cli_programmer uses uartboot.bin for communicating with the target. 
+Copying uartboot.bin to the folder of the cli_programmer binary will allow cli_programmer to automatically detect & use uartboot.bin.
+Alternatively the path to uartboot.bin can be provided to cli_programmer using -b commandline option.
+
+3.2 COMPILING FOR EXECUTION FROM FLASH
+--------------------------------------------
+SDK projects come with Eclipse build configurations which compile for execution for FLASH(cached) or RAM.
+Configuring a project for execution from FLASH/RAM breaks down to the following steps:
+
+1. Configure the memory mapping in linker script.
+Using Eclipse:
+Edit ldscripts/mem.ld.h in project's folder (instructions can be found in file's header comments).
+During project build the mem.ld file will be automatically updated.
+
+Outside Eclipse:
+Edit project's ldscripts/mem.ld file.
+
+2. Configure project to compile for execution from FLASH.
+In file ./sdk/bsp/bsp_config.h, set the macros below as follows and compile as usual:
+For execution from FLASH(cached):
+#define dg_configEXEC_MODE                      MODE_IS_CACHED
+#define dg_configCODE_LOCATION                  NON_VOLATILE_IS_FLASH//NON_VOLATILE_IS_NONE
+
+For execution from FLASH(mirrored):
+#define dg_configEXEC_MODE                      MODE_IS_MIRRORED
+#define dg_configCODE_LOCATION                  NON_VOLATILE_IS_FLASH//NON_VOLATILE_IS_NONE
+
+For execution from RAM:
+//#define dg_configEXEC_MODE                    MODE_IS_CACHED
+#define dg_configCODE_LOCATION                  NON_VOLATILE_IS_NONE
+
+NOTES: 
+-The BINARY output (image.bin, NOT the image.elf) will be used in the next steps.
+
+3.3 FLASHING QSPI IMAGE
+--------------------------------------------
+Using Eclipse:
+Import “scripts” project and you will get a “program_qspi_win” entry under the “External tools” menu.
+Compile uartboot project (RELEASE configuration).
+Select the folder which includes image.bin (e.g the project's Debug folder) and run "program_qspi_win" from Eclipse external tools menu button (WIN OS platform only).
+
+Outside Eclipse:
+Use scripts in SDK's utilities/scripts/qspi folder as follows:
+Linux:
+./program_qspi.sh <comport> image.bin
+
+Win:
+program_qspi.bat <path to folder containing image.bin>
+
+Flashing an image to flash breaks down to the following steps:
+1. Add QSPI header in the BINARY FILE that will programmed in QSPI:
+For execution from FLASH(cached):
+./bin2image qspi_cached image.bin image.bin.cached
+For execution from FLASH(mirrored/qspi operating in single mode/development path):
+./bin2image qspi_single_mirrored image.bin image.bin.cached
+For execution from FLASH(mirrored/production path):
+./bin2image qspi_mirrored image.bin image.bin.cached
+
+2. Program QSPI over Uart:
+Use cli_programmer tool:
+./cli_programmer COM_PORT write_qspi 0x0 image.bin.cached  (Replace COM_PORT with the enumeration of the Dev.board port when you connect it in your PC (e.g /dev/ttyUSB0))
+
+
+4. DEBUGGING FROM QSPI
+============================================
+4.1 General
+--------------------------------------------
+The user may use Jtag i/f to attach to the running target & debug , OR reset board & debug as follows:
+Using Eclipse:
+The SDK includes Eclipse launch configurations provided with the SDK projects (*_attach.launch for attaching to running target and *_qspi.launch for resetting&attaching to target)
+
+Outside Eclipse:
+The SDK includes sample scripts & gdb commands in utilities/scripts/qspi folder:
+-boot_qspi_dbg* scripts reset board and put a breakpoint in main(). The scripts invoke Jlink gdb server and issue gdb commands
+-gdb_cmd_qspi_* files are the gdb command files used by the above scripts
+Instructions on using these scripts are provided in the next paragraph.
+
+4.2 Debugging with gdb scripts
+--------------------------------------------
+1. The scripts include references to the executables:
+-JLinkGDBServerCL
+-arm-none-eabi-gdb 
+
+Make sure that you have the paths to these executables included in your platform's system path.
+If not, edit script files and add the absolute paths to these executables, 
+e.g in boot_qspi_dbg.bat: replace JLinkGDBServerCL.exe with C:\Program Files\SEGGER\JLink_V498e\JLinkGDBServerCL.exe
+
+2. Edit the Debug scripts (boot_qspi_dbg.*) and replace PUT_YOUR_APP_ELF_HERE.elf with the name of the .elf file you want to debug.
+This should be the .elf file of the binary image flashed in the QSPI.
+
+3. Execute the boot_qspi_dbg.* script. 
+You should see the Jlink gdb server running, connecting to target, downloading & running the boot loader and CPU halting at main() breakpoint.
+After this point you can issue a "continue" command and debug using the same gdb server instance.
+Alternatively you can invoke a 2nd instance of Jlink gdb server and attach to the target.
+
+NOTE: Since hardware breakpoints are used, only 4 breakpoints are available.
+

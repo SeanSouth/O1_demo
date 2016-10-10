@@ -1,0 +1,45 @@
+DESCRIPTION
+====================
+The otp_patch_ac should be applied to chip rev AC for supporting Macronix and Giga flash devices.
+It does the following:
+-Writes the qspi_loader() function (which sets the QE bit according to the flash type used):
+Address: OTP address OTP_QSPI_FLASH_START_CODE_SEGMENTS = OTP_BASE_ADDRESS + 0xF818 (0xF818/8=0x1f03)
+Buffer: The array from .out of the qspi_loader() compilation
+Size : 125 = 0x7D (32bit words)
+Command: cli_programmer.exe <comport> write_otp 0x1f03 0x7D 0x2010B5F8 0x06892103 ....
+
+-Writes the size,address of qspi_loader():
+Address: OTP_QSPI_FLASH_LOADER_SECTION_ADDR = OTP_BASE_ADDRESS + 0xF808 (0xf808/8=0x1f01)
+Buffer: 0x7D , OTP_BASE_ADDRESS + 0xF818 =  0x7D, 0x7F80000 + 0xF818  = 0x7D, 0x07F8F818  (18 F8 F8 07 7D 00 00 00)
+Size : 2 (32 bit words)
+Command: cli_programmer.exe <comport> write_otp 0x1f01 2 0x07F8F818  0x7D
+
+-Enables OTP implementation for qspi_loader():
+Address: OTP_QSPI_FUNCTIONS_SELECT = OTP_BASE_ADDRESS + 0xEA48 (0xEA48/8=0x1d49) 
+Buffer: 0x00, 0x04 (04 00 00 00 00 00 00 00)
+Size : 2 (32 bit words)
+Command: cli_programmer.exe <comport> write_otp 0x1d49 2 0x04  0x0
+
+APPLYING THE PATCH
+====================
+The patch can be applied using utilities/scripts/otp/otp_patch.sh as follows:
+Linux: ./otp_patch.sh <comport>   
+Windows: otp_patch.bat
+
+The script invokes cli_programmer as described above.
+
+TESTING THE PATCH
+====================
+The otp_patch script can operate in NORMAL or TEST mode (default: NORMAL).
+The mode is selected by the MODE variable defined at the top of the script.
+TEST MODE: Tests script by writing the patch data in addresses 0x00-0x3B
+The written data (QSPI_CHECK function patch data, 0x7D, 0x07F8F818, 0x02,  0x0) can be read using:
+cli_programmer.exe <comport> read_otp 0x00 0x3B
+
+NORMAL MODE: Applies the patch in the correct OTP addresses.
+The written data (QSPI_CHECK function patch data, see below) can be read using:
+cli_programmer.exe <comport> read_otp 0x1f03 0x7D
+
+Note that the data are read in reverse byte order and in 64 bit format.
+
+
